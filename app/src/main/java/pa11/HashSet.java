@@ -1,108 +1,147 @@
 package pa11;
+import java.util.LinkedList;
 
 public class HashSet {
+    private int capacity = 13;
+    private int size = 0;
+    LinkedList<String>[] setList;
 
-    /**
-     * Constructor for the set
-     */
+    @SuppressWarnings("unchecked")
     public HashSet() {
         System.out.println("HashSet");
+        setList = new LinkedList[capacity];
+        for (int i = 0; i < capacity; i++) {
+            setList[i] = new LinkedList<>();
+        }
     }
 
-    /**
-     * Size of the set
-     * @return the number of elements in the set
-     */
     public int size() {
-        System.out.println("Size");
-        return 0;
+        System.out.println("Size is " + this.size);
+        return this.size;
     }
 
-    /** 
-     * Check if the set is empty
-     * @return a boolean indicating whether the set is empty
-     */
     public boolean isEmpty() {
-        return false;
+        return this.size == 0;
     }
 
-    /**
-     * Add an element to the set
-     * @param s the element to add
-     * @return the old value associated with the key, or null if no such entry exists
-     */
+    private int hashingAlgorithm(String s) {
+        System.out.println("Hashing " + s);
+        int value = 0;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            int ascii = (int) c;
+            value += ascii; 
+        }
+        return value % capacity;
+    }
+
     public void add(String s) {
         System.out.println("Adding " + s);
+        if (s == null) return;
+        
+        int listNum = hashingAlgorithm(s);
+        
+        if (contains(s)) return;
+        
+        setList[listNum].add(s);
+        size++;
     }
 
-    /** 
-     * Remove an element from the set
-     * @param s the element to remove
-     * @return the value associated with the key, or null if no such entry exists
-     */
     public void remove(String s) {
         System.out.println("Removing " + s);
+        if (s == null) return;
+
+        int listNum = hashingAlgorithm(s);
+        
+        if (setList[listNum].remove(s)) {
+            size--;
+        }
     }
 
-    /** 
-     * Check if the set contains an element
-     * @param s the element to check for
-     * @return a boolean indicating whether the set contains the element
-     */
     public boolean contains(String s) {
         System.out.println("Contains " + s);
-        return false;
+        if (s == null) return false;
+
+        int listNum = hashingAlgorithm(s);
+        return setList[listNum].contains(s);
     }
 
-    /** 
-     * Clears the set
-     */
     public void clear() {
         System.out.println("Clear");
+        for (int i = 0; i < capacity; i++) {
+            setList[i].clear();
+        }
+        size = 0;
     }
 
-    /** 
-     * Convert the set to an array
-     * @return an array containing all the elements in the set
-     */
     public String[] toArray() {
-        return null;
+        String[] arr = new String[size];
+        int index = 0;
+        for (int i = 0; i < capacity; i++) {
+            for (String s : setList[i]) {
+                arr[index++] = s;
+            }
+        }
+        return arr;
     }
 
-    /** 
-     * Takes the intersection of the current set and the `other` set
-     * @param other the set to intersect with
-     * @return a new `HashSet` containing the intersection of the current set and the `other` set
-     */
     public HashSet intersection(HashSet other) {
-        return null;
-    }
-
-    /** 
-     * Convert the set to a string
-     * @param other the set to union with
-     * @return a new `HashSet` containing the union of the current set and the `other` set
-     */
-    public HashSet union(HashSet other) {
-        return null;
-    }
-
-    /** 
-     * Takes the difference of the current set and the `other` set 
-     * @param other the set to take the difference with
-     * @return a new `HashSet` containing the difference of the current set and the `other` set
-     */
-    public HashSet difference(HashSet other) {
-        return null;
-    }
-
-    /** 
-     * Check if the current set is a subset of the `other` set
-     * @param other the set to check for a subset
-     * @return a boolean indicating whether the current set is a subset of the `other` set
-     */
-    public boolean subset(HashSet other) {
-        return false;
-    }
+        if (other == null) return new HashSet();
         
+        HashSet result = new HashSet();
+        for (int i = 0; i < capacity; i++) {
+            for (String s : setList[i]) {
+                if (other.contains(s)) {
+                    result.add(s);
+                }
+            }
+        }
+        return result;
+    }
+
+    public HashSet union(HashSet other) {
+        HashSet result = new HashSet();
+        
+        for (int i = 0; i < capacity; i++) {
+            for (String s : setList[i]) {
+                result.add(s);
+            }
+        }
+        
+        if (other != null) {
+            String[] otherElements = other.toArray();
+            for (String s : otherElements) {
+                result.add(s);
+            }
+        }
+        
+        return result;
+    }
+
+    public HashSet difference(HashSet other) {
+        HashSet result = new HashSet();
+        
+        for (int i = 0; i < capacity; i++) {
+            for (String s : setList[i]) {
+                if (other == null || !other.contains(s)) {
+                    result.add(s);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    public boolean subset(HashSet other) {
+        if (other == null) return false;
+        
+        for (int i = 0; i < capacity; i++) {
+            for (String s : setList[i]) {
+                if (!other.contains(s)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }
